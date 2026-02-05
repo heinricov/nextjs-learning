@@ -1,34 +1,9 @@
-# 02-use-api
-
-## SETUP
-
-- Create file `.env`
-- Add `NEXT_PUBLIC_API_URL=http://localhost:3000`
-
-```bash
-touch .env
-echo "NEXT_PUBLIC_API_URL=http://localhost:4000" >> .env
-```
-
-- Create file services for communication with API
-  - Create file `services/api.ts`
-
-```bash
-mkdir services
-touch services/api.ts
-```
-
-```ts
-// Fungsi: Mengambil base URL API dari environment NEXT_PUBLIC_API_URL
 export function getBaseUrl(): string {
-  const raw = process.env.NEXT_PUBLIC_API_URL;
-  if (!raw) {
-    throw new Error(
-      "NEXT_PUBLIC_API_URL tidak ditemukan. Pastikan variabel ini ada di file .env"
-    );
-  }
+  const raw = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
   return raw.replace(/\/+$/, "");
 }
+
+const endpoint = "/posts";
 
 // Fungsi: Mengecek koneksi ke API dengan melakukan request ke base URL
 export async function checkConnection(): Promise<{
@@ -40,7 +15,10 @@ export async function checkConnection(): Promise<{
   let url = "-";
   try {
     url = getBaseUrl();
-    const res = await fetch(url, { method: "GET", cache: "no-store" });
+    const res = await fetch(url + endpoint, {
+      method: "GET",
+      cache: "no-store"
+    });
     return { url, ok: res.ok, status: res.status };
   } catch (err) {
     return {
@@ -65,10 +43,3 @@ export async function apiFetch(
   const full = base + (path.startsWith("/") ? path : `/${path}`);
   return fetch(full, { cache: "no-store", ...init });
 }
-```
-
-- Create file components for UI
-  - Create file `components/conection.tsx`
-  - Create file `components/hero-section.tsx`
-  - Use `components/conection.tsx` in `components/hero-section.tsx`
--
